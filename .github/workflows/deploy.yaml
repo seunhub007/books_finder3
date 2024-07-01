@@ -11,7 +11,7 @@ jobs:
 
     - name: Checkout source code
       uses: actions/checkout@v2
-      
+
     - name: Generate deployment package
       run: zip -r deploy.zip . -x '*.git*'
 
@@ -24,3 +24,17 @@ jobs:
         environment_name: test-env
         version_label: app-473b-240701_160736392419
         region: us-east-1
+    - name: Wait for Elastic Beanstalk to become healthy
+      run: |
+        END=$((SECONDS+600))  # Wait up to 10 minutes
+        while [ $SECONDS -lt $END ]; do
+          STATUS=$(aws elasticbeanstalk describe-environments --environment-names test-env --query "Environments[0].Health" --output text)
+          echo "Current health status: $STATUS"
+          if [ "$STATUS" = "Green" ]; then
+            echo "Environment is healthy."
+            exit 0
+          fi
+          sleep 30
+        done
+        echo "Environment did not become healthy in time."
+        exit 1     
