@@ -14,16 +14,7 @@ jobs:
 
     - name: Generate deployment package
       run: zip -r deploy.zip . -x '*.git*'
-
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v22
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: books_finder3
-        environment_name: test-env
-        version_label: app-473b-240701_160736392419
-        region: us-east-1
+    
     - name: Wait for Elastic Beanstalk to become healthy
       run: |
         END=$((SECONDS+600))  # Wait up to 10 minutes
@@ -37,4 +28,15 @@ jobs:
           sleep 30
         done
         echo "Environment did not become healthy in time."
-        exit 1     
+        exit 1       
+
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v22
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: books_finder3
+        environment_name: test-env
+        version_label: app-473b-240701_160736392419
+        region: us-east-1
+    
