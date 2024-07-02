@@ -8,13 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+
     - name: Checkout source code
       uses: actions/checkout@v2
   
@@ -31,17 +25,4 @@ jobs:
         version_label: app-473b-240701_160736392419
         region: us-east-1
 
-    - name: Wait for Elastic Beanstalk to become healthy
-      run: |
-        END=$((SECONDS+600))  # Wait up to 10 minutes
-        while [ $SECONDS -lt $END ]; do
-          STATUS=$(aws elasticbeanstalk describe-environments --environment-names test-env --query "Environments[0].Health" --output text)
-          echo "Current health status: $STATUS"
-          if [ "$STATUS" = "Green" ]; then
-            echo "Environment is healthy."
-            exit 0
-          fi
-          sleep 30
-        done
-        echo "Environment did not become healthy in time."
-        exit 1
+  
